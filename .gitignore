@@ -1,2 +1,3 @@
 /pomelo-dotnetClient/bin/Debug/*.dll
 /pomelo-dotnetClient/obj
+*.suo

@@ -13,6 +13,11 @@ namespace Pomelo.DotNetClient
 		private HeartBeatService heartBeatService = null;
 		private PomeloClient pc;
 
+		public Pomelo.DotNetClient.ProtocolState State {
+			get { return state; }
+			set { state = value; }
+		}
+
 		public PomeloClient getPomeloClient(){
 			return this.pc;
 		}

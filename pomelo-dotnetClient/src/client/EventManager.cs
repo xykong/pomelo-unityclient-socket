@@ -7,13 +7,13 @@ namespace Pomelo.DotNetClient
 {
 	public class EventManager : IDisposable
 	{
-		private  Dictionary<uint, Action<JsonObject>> callBackMap;
-		private  Dictionary<string, List<Action<JsonObject>>> eventMap;
+		private Dictionary<uint, Action<JsonObject>> callBackMap;
+		private Dictionary<string, List<Action<JsonObject>>> eventMap;
 
 		public EventManager()
 		{
-			this.callBackMap = new  Dictionary<uint, Action<JsonObject>>();
-			this.eventMap = new  Dictionary<string, List<Action<JsonObject>>>();
+			this.callBackMap = new Dictionary<uint, Action<JsonObject>>();
+			this.eventMap = new Dictionary<string, List<Action<JsonObject>>>();
 		}
 
 		//Adds callback to callBackMap by id.
@@ -30,10 +30,13 @@ namespace Pomelo.DotNetClient
 		/// <param name='pomeloMessage'>
 		/// Pomelo message.
 		/// </param>
-		public void InvokeCallBack(uint id, JsonObject data)
-		{
-			if(!callBackMap.ContainsKey(id)) return;
+		public void InvokeCallBack(uint id, JsonObject data) {
+			if (!callBackMap.ContainsKey(id)) {
+				Console.WriteLine("InvokeCallBack Can't find id:" + id);
+				return;
+			}
 			callBackMap[id].Invoke(data);
+			callBackMap.Remove(id);
 		}
 
 		//Adds the event to eventMap by name.
@@ -56,11 +59,11 @@ namespace Pomelo.DotNetClient
 		/// <param name="value"></param>
 		/// <returns></returns>
 		///
-		public void InvokeOnEvent (string route, JsonObject msg) {
-			if(!this.eventMap.ContainsKey(route)) return;
+		public void InvokeOnEvent(string route, JsonObject msg) {
+			if (!this.eventMap.ContainsKey(route)) return;
 
 			List<Action<JsonObject>> list = eventMap[route];
-			foreach(Action<JsonObject> action in list) action.Invoke(msg);
+			foreach (Action<JsonObject> action in list) action.Invoke(msg);
 		}
 
 		// Dispose() calls Dispose(true)
