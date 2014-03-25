@@ -35,6 +35,8 @@ namespace Pomelo.DotNetClient
 			this.transporter.start();
 			this.handshake.request(user, callback);
 
+			this.pc.on(PomeloClient.EVENT_HANDSHAKE, callback);
+
 			this.state = ProtocolState.handshaking;
 		}
 		
@@ -140,7 +142,8 @@ namespace Pomelo.DotNetClient
 			//Invoke handshake callback
 			JsonObject user = new JsonObject();
 			if(msg.ContainsKey("user")) user = (JsonObject)msg["user"];
-			handshake.invokeCallback(user);
+			//handshake.invokeCallback(user);
+			this.pc.processMessage(new Message(MessageType.MSG_PUSH, 0, PomeloClient.EVENT_HANDSHAKE, user));
 		}
 
 		//The socket disconnect

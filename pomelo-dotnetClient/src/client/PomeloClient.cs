@@ -10,6 +10,7 @@ using System.Collections.Generic;
 
 namespace Pomelo.DotNetClient {
 	public class PomeloClient : IDisposable {
+		public const string EVENT_HANDSHAKE = "handshake";
 		public const string EVENT_DISCONNECT = "disconnect";
 
 		private EventManager eventManager;
@@ -86,7 +87,8 @@ namespace Pomelo.DotNetClient {
 			try {
 				protocol.start(user, handshakeCallback);
 				return true;
-			}catch(Exception e){
+			}
+			catch (Exception e) {
 				Console.WriteLine(e.ToString());
 				return false;
 			}
@@ -136,6 +138,13 @@ namespace Pomelo.DotNetClient {
 			Dispose();
 		}
 
+		public void disconnect(Action<JsonObject> action) {
+			Dispose();
+			if (action != null) {
+				action.Invoke(null);
+			}
+		}
+
 		public void Dispose() {
 			Dispose(true);
 			GC.SuppressFinalize(this);
@@ -145,15 +154,19 @@ namespace Pomelo.DotNetClient {
 		protected virtual void Dispose(bool disposing) {
 			if (this.disposed) return;
 
+			//Call disconnect callback
+			//eventManager.InvokeOnEvent(EVENT_DISCONNECT, null);
+			this.pushMessage(new Message(MessageType.MSG_PUSH, 0, EVENT_DISCONNECT, null));
+
 			if (disposing) {
 				// free managed resources
 				this.protocol.close();
-				this.socket.Shutdown(SocketShutdown.Both);
-				this.socket.Close();
+				if (this.socket != null) {
+					this.socket.Shutdown(SocketShutdown.Both);
+					this.socket.Close();
+					this.socket = null;
+				}
 				this.disposed = true;
-
-				//Call disconnect callback
-				eventManager.InvokeOnEvent(EVENT_DISCONNECT, null);
 			}
 		}
 	}
